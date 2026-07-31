@@ -12,7 +12,7 @@ class DashboardModel {
   final String pergerakanTanah;
   final String sensorAktif;
 
-final List<LocationModel> lokasiBerisiko;
+  final List<LocationModel> lokasiBerisiko;
 
   const DashboardModel({
     required this.status,
@@ -26,22 +26,24 @@ final List<LocationModel> lokasiBerisiko;
     required this.lokasiBerisiko,
   });
 
- factory DashboardModel.fromJson(Map<String, dynamic> json) {
+  factory DashboardModel.fromJson(Map<String, dynamic> json) {
     return DashboardModel(
-      status: json["status"],
-      lokasi: json["lokasi"],
-      rekomendasi: json["rekomendasi"],
-      updateTerakhir: json["updateTerakhir"],
+      status: json["status"] ?? "",
+      lokasi: json["lokasi"] ?? "",
+      rekomendasi: json["rekomendasi"] ?? "",
+      updateTerakhir: json["updateTerakhir"] ?? "",
 
-      kelembabanTanah: json["kelembabanTanah"],
-      curahHujan: json["curahHujan"],
+      // Menggunakan (as num?)?.toDouble() agar fleksibel menerima int maupun double
+      kelembabanTanah: (json["kelembabanTanah"] as num?)?.toDouble() ?? 0.0,
+      curahHujan: (json["curahHujan"] as num?)?.toDouble() ?? 0.0,
 
-      pergerakanTanah: json["pergerakanTanah"],
-      sensorAktif: json["sensorAktif"],
+      pergerakanTanah: json["pergerakanTanah"] ?? "",
+      sensorAktif: json["sensorAktif"] ?? "",
 
-      lokasiBerisiko: (json["lokasiBerisiko"] as List)
-          .map((item) => LocationModel.fromJson(item))
-          .toList(),
+      lokasiBerisiko: (json["lokasiBerisiko"] as List<dynamic>?)
+              ?.map((item) => LocationModel.fromJson(item))
+              .toList() ??
+          [],
     );
   }
 }
