@@ -22,3 +22,4 @@ factory HistoryModel.fromJson(Map<String, dynamic> json) {
     waktu: json["waktu"] ?? "",
   );
 }
+}

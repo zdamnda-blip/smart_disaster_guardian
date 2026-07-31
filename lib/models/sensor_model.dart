@@ -27,3 +27,4 @@ factory SensorModel.fromJson(Map<String, dynamic> json) {
     pergerakanTanah: json["pergerakanTanah"] ?? "",
   );
 }
+}
