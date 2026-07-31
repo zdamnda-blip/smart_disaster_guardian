@@ -16,7 +16,7 @@ class ApiService {
     "Accept": "application/json",
   };
   /// ===========================
-  /// DASHBOARD
+  /// DASHBOARD 
   /// ===========================
 
   static Future<DashboardModel> getDashboard() async {
@@ -34,7 +34,7 @@ class ApiService {
   }
 
   /// ===========================
-  /// SENSOR
+  /// SENSOR 
   /// ===========================
 
   static Future<List<SensorModel>> getSensors() async {
@@ -55,7 +55,7 @@ class ApiService {
   }
 
   /// ===========================
-  /// HISTORY SENSOR
+  /// HISTORY SENSOR 
   /// ===========================
 
   static Future<SensorHistoryModel> getSensorHistory(
