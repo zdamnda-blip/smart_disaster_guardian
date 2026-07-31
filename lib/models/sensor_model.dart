@@ -3,8 +3,8 @@ class SensorModel {
   final String namaLokasi;
   final String status;
 
-  final int kelembabanTanah;
-  final int curahHujan;
+  final double kelembabanTanah;
+  final double curahHujan; 
 
   final String pergerakanTanah;
 

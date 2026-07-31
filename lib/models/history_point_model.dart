@@ -1,8 +1,8 @@
 class HistoryPointModel {
   final String time;
 
-  final int kelembabanTanah;
-  final int curahHujan;
+  final double kelembabanTanah;
+  final double curahHujan;
 
   final bool pergerakanTanah;
 
