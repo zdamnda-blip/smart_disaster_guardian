@@ -9,7 +9,7 @@ import '../models/sensor_model.dart';
 
 class ApiService {
   static const String baseUrl =
-    "http://192.168.1.132:8000";
+    "https://undusted-vagrantly-fountain.ngrok-free.dev";
 
      static const Map<String, String> headers = {
     "ngrok-skip-browser-warning": "true",

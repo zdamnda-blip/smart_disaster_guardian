@@ -13,13 +13,12 @@ class HistoryModel {
     required this.waktu,
   });
 
-  factory HistoryModel.fromJson(Map<String, dynamic> json) {
-    return HistoryModel(
-      id: json["id"],
-      lokasi: json["lokasi"],
-      status: json["status"],
-      deskripsi: json["deskripsi"],
-      waktu: json["waktu"],
-    );
-  }
+factory HistoryModel.fromJson(Map<String, dynamic> json) {
+  return HistoryModel(
+    id: json["id"] ?? 0,
+    lokasi: json["lokasi"] ?? "",
+    status: json["status"] ?? "",
+    deskripsi: json["deskripsi"] ?? "",
+    waktu: json["waktu"] ?? "",
+  );
 }

@@ -14,12 +14,11 @@ class LocationModel {
   });
 
  factory LocationModel.fromJson(Map<String, dynamic> json) {
-    return LocationModel(
-      namaLokasi: json["namaLokasi"],
-      status: json["status"],
-      kelembaban: json["kelembaban"],
-      curahHujan: json["curahHujan"],
-      pergerakanTanah: json["pergerakanTanah"],
-    );
-  }
+  return LocationModel(
+    namaLokasi: json["namaLokasi"] ?? "",
+    status: json["status"] ?? "",
+    kelembaban: (json["kelembaban"] as num?)?.toDouble() ?? 0.0,
+    curahHujan: (json["curahHujan"] as num?)?.toDouble() ?? 0.0,
+    pergerakanTanah: json["pergerakanTanah"] ?? "",
+  );
 }

@@ -17,14 +17,13 @@ class SensorModel {
     required this.pergerakanTanah,
   });
 
-  factory SensorModel.fromJson(Map<String, dynamic> json) {
-    return SensorModel(
-      id: json["id"],
-      namaLokasi: json["namaLokasi"],
-      status: json["status"],
-      kelembabanTanah: json["kelembabanTanah"],
-      curahHujan: json["curahHujan"],
-      pergerakanTanah: json["pergerakanTanah"],
-    );
-  }
+factory SensorModel.fromJson(Map<String, dynamic> json) {
+  return SensorModel(
+    id: json["id"] ?? 0,
+    namaLokasi: json["namaLokasi"] ?? "",
+    status: json["status"] ?? "",
+    kelembabanTanah: (json["kelembabanTanah"] as num?)?.toDouble() ?? 0.0,
+    curahHujan: (json["curahHujan"] as num?)?.toDouble() ?? 0.0,
+    pergerakanTanah: json["pergerakanTanah"] ?? "",
+  );
 }
