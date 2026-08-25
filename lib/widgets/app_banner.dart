@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 import '../theme/app_radius.dart';
 import '../theme/app_shadows.dart';
+import '../pages/admin/admin_login_page.dart';
 
-class AppBanner extends StatelessWidget {
+class AppBanner extends StatefulWidget {
   final String title;
   final String image;
   final String? badge;
@@ -18,6 +20,32 @@ class AppBanner extends StatelessWidget {
   });
 
   @override
+  State<AppBanner> createState() => _AppBannerState();
+}
+
+class _AppBannerState extends State<AppBanner> {
+  int _tapCount = 0;
+  DateTime? _lastTapTime;
+
+  void _handleLiveBadgeTap() {
+    final now = DateTime.now();
+    if (_lastTapTime == null || now.difference(_lastTapTime!) > const Duration(seconds: 3)) {
+      _tapCount = 1;
+    } else {
+      _tapCount++;
+    }
+    _lastTapTime = now;
+
+    if (_tapCount >= 5) {
+      _tapCount = 0;
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const AdminLoginPage()),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       height: 170,
@@ -26,7 +54,7 @@ class AppBanner extends StatelessWidget {
         borderRadius: AppRadius.large,
         boxShadow: AppShadows.medium,
         image: DecorationImage(
-          image: AssetImage(image),
+          image: AssetImage(widget.image),
           fit: BoxFit.cover,
         ),
       ),
@@ -47,37 +75,22 @@ class AppBanner extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-            if (badge != null || showLiveIndicator)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-
-                  if (badge != null)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.25),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        badge!,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    )
-                  else
-                    const SizedBox.shrink(),
-
-                  if (showLiveIndicator)
-                    Container(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (widget.showLiveIndicator)
+                  GestureDetector(
+                    onTap: _handleLiveBadgeTap,
+                    child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,
                         vertical: 4,
@@ -109,22 +122,12 @@ class AppBanner extends StatelessWidget {
                         ],
                       ),
                     ),
-                ],
-              ),
-
-            const Spacer(),
-
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-              ),
+                  ),
+              ],
             ),
           ],
         ),
       ),
     );
   }
-}
+}

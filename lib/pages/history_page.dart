@@ -143,43 +143,54 @@ class _HistoryPageState extends State<HistoryPage> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: AppColors.primary,
+        leading: IconButton(
+          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 30),
+          onPressed: () {},
+        ),
+        title: const Text(
+          "INFORMASI",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            letterSpacing: 1,
+          ),
+        ),
+        centerTitle: true,
+        elevation: 0,
+      ),
       body: RefreshIndicator(
         onRefresh: loadHistory,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(16),
-          child: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const AppBanner(
-                   title: "Smart Disaster\nGuardian",
-                   image: "assets/images/history_banner.jpeg",
-                   badge: "INFORMASI",
-                ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // MODIFIED: Removed AppBanner
+              HistoryList(
+                histories: histories,
+              ),
 
-                HistoryList(
-                  histories: histories,
-                ),
+              const SizedBox(height: 24),
 
-                const SizedBox(height: 24),
+              const StatusInfoSection(),
 
-                const StatusInfoSection(),
+              const SizedBox(height: 24),
 
-                const SizedBox(height: 24),
+              const EvacuationSection(),
 
-                const EvacuationSection(),
+              const SizedBox(height: 24),
 
-                const SizedBox(height: 24),
+              const EmergencyButton(),
 
-                const EmergencyButton(),
-
-                const SizedBox(height: 30),
-              ],
-            ),
+              const SizedBox(height: 30),
+            ],
           ),
         ),
       ),
     );
   }
-}
+}

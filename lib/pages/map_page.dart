@@ -198,52 +198,65 @@ class _MapPageState extends State<MapPage> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: AppColors.primary,
+        leading: IconButton(
+          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 30),
+          onPressed: () {
+            // Since it's in a bottom nav, back could mean nothing or go to Dashboard
+          },
+        ),
+        title: const Text(
+          "MONITORING",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            letterSpacing: 1,
+          ),
+        ),
+        centerTitle: true,
+        elevation: 0,
+      ),
       body: RefreshIndicator(
         onRefresh: loadSensors,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(16),
-          child: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const AppBanner(
-                  title: "Smart Disaster\nGuardian",
-                  image: "assets/images/map_banner.jpeg",
-                  badge: "MONITORING",
-                ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // MODIFIED: Removed AppBanner
+              MapArea(
+                sensors: sensors,
+                selectedSensorId: selectedSensorId,
+                onMarkerTap: (sensor) {
+                  loadSensorHistory(sensor.id);
+                },
+              ),
 
-                MapArea(
-                  sensors: sensors,
-                  selectedSensorId: selectedSensorId,
-                  onMarkerTap: (sensor) {
-                    loadSensorHistory(sensor.id);
-                  },
-                ),
+              const SizedBox(height: 24),
 
-                const SizedBox(height: 24),
+              ChartBox(
+                history: history,
+              ),
 
-                ChartBox(
-                  history: history,
-                ),
+              const SizedBox(height: 24),
 
-                const SizedBox(height: 24),
+              SensorList(
+                key: sensorListKey,
+                sensors: sensors,
+                selectedSensorId: selectedSensorId,
+                onSensorTap: (sensor) {
+                  loadSensorHistory(sensor.id);
+                },
+              ),
 
-                SensorList(
-                  key: sensorListKey,
-                  sensors: sensors,
-                  selectedSensorId: selectedSensorId,
-                  onSensorTap: (sensor) {
-                    loadSensorHistory(sensor.id);
-                  },
-                ),
-
-                const SizedBox(height: 30),
-              ],
-            ),
+              const SizedBox(height: 30),
+            ],
           ),
         ),
       ),
     );
   }
-}
+}

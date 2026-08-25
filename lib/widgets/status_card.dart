@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/dashboard_model.dart';
+import '../models/location_model.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_shadows.dart';
@@ -15,124 +16,137 @@ class StatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color badgeColor;
-    IconData statusIcon;
-
-    switch (dashboard.status.toLowerCase()) {
-      case "aman":
-        badgeColor = AppColors.aman;
-        statusIcon = Icons.check_circle_rounded;
-        break;
-
-      case "waspada":
-        badgeColor = AppColors.waspada;
-        statusIcon = Icons.warning_rounded;
-        break;
-
-      default:
-        badgeColor = AppColors.siaga;
-        statusIcon = Icons.warning_rounded;
+    if (dashboard.status.toLowerCase() == "aman" || dashboard.lokasiBerisiko.isEmpty) {
+      return _buildAmanCard();
     }
 
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            badgeColor,
-            badgeColor.withOpacity(0.75),
-          ],
-        ),
-        borderRadius: AppRadius.large,
-        boxShadow: AppShadows.medium,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-
-            // Icon + Status besar
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.25),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    statusIcon,
-                    color: Colors.white,
-                    size: 22,
-                  ),
-                ),
-
-                const SizedBox(width: 12),
-
-                Text(
-                  dashboard.status,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 24,
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 16),
-
-            // Lokasi
-            Row(
-              children: [
-                const Icon(
-                  Icons.location_on_rounded,
-                  color: Colors.white,
-                  size: 16,
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    "Lokasi: ${dashboard.lokasi}",
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 8),
-
-            // Update terakhir
-            Row(
-              children: [
-                const Icon(
-                  Icons.access_time_rounded,
-                  color: Colors.white,
-                  size: 16,
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    "Update Terakhir ${dashboard.updateTerakhir}",
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+    return SizedBox(
+      height: 120, // Adjusted height for side-scrolling cards
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: dashboard.lokasiBerisiko.length,
+        separatorBuilder: (context, index) => const SizedBox(width: 12),
+        itemBuilder: (context, index) {
+          return _buildRiskCard(dashboard.lokasiBerisiko[index], dashboard.updateTerakhir);
+        },
       ),
     );
   }
-}
+
+  Widget _buildAmanCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppColors.aman,
+        borderRadius: AppRadius.large,
+        boxShadow: AppShadows.medium,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.25),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.check, color: Colors.white, size: 20),
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                "AMAN",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  letterSpacing: 1,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            "Semua titik sensor dalam kondisi aman",
+            style: TextStyle(color: Colors.white, fontSize: 13),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Icon(Icons.access_time_rounded, color: Colors.white, size: 14),
+              const SizedBox(width: 6),
+              Text(
+                dashboard.updateTerakhir,
+                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRiskCard(LocationModel location, String updateTime) {
+    Color cardColor = location.status.toLowerCase() == "bahaya" ? AppColors.siaga : AppColors.waspada;
+    IconData iconData = location.status.toLowerCase() == "bahaya" ? Icons.warning_rounded : Icons.warning_amber_rounded;
+
+    return Container(
+      width: 200, // Fixed width for horizontal scrolling
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: AppRadius.large,
+        boxShadow: AppShadows.medium,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(iconData, color: Colors.white, size: 22),
+              const SizedBox(width: 8),
+              Text(
+                location.status.toUpperCase(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  letterSpacing: 1,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.location_on_rounded, color: Colors.white, size: 14),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  "Lokasi : ${location.namaLokasi}",
+                  style: const TextStyle(color: Colors.white, fontSize: 12, height: 1.2),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              const Icon(Icons.access_time_rounded, color: Colors.white, size: 14),
+              const SizedBox(width: 4),
+              Text(
+                updateTime, // Or location-specific time if available
+                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../models/dashboard_model.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
+import '../widgets/announcement_section.dart'; // NEW
 import '../widgets/app_banner.dart';
 import '../widgets/location_section.dart';
 import '../widgets/sensor_grid.dart';
@@ -169,9 +170,8 @@ class _DashboardPageState extends State<DashboardPage> {
               children: [
 
                 const AppBanner(
-                  title: "Smart Disaster\nGuardian",
+                  title: "SIGAP", // MODIFIED: Changed to SIGAP
                   image: "assets/images/dashboard_banner.jpeg",
-                  badge: "DASHBOARD",
                   showLiveIndicator: true,
                 ),
 
@@ -189,6 +189,10 @@ class _DashboardPageState extends State<DashboardPage> {
                 ),
 
                 const SizedBox(height: 24),
+                
+                const AnnouncementSection(), // NEW
+
+                const SizedBox(height: 24),
 
                 LocationSection(
                   dashboard: dashboard!,
@@ -204,4 +208,4 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
     );
   }
-}
+}
