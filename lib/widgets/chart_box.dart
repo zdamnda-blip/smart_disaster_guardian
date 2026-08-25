@@ -6,6 +6,7 @@ import '../theme/app_radius.dart';
 import '../theme/app_shadows.dart';
 import 'chart_hint.dart';
 import 'chart_legend.dart';
+import 'sensor_trend_chart.dart';
 
 class ChartBox extends StatelessWidget {
   final SensorHistoryModel? history;
@@ -19,14 +20,11 @@ class ChartBox extends StatelessWidget {
     switch (status.toLowerCase()) {
       case "aman":
         return AppColors.aman;
-
       case "waspada":
         return AppColors.waspada;
-
       case "siaga":
       case "bahaya":
         return AppColors.siaga;
-
       default:
         return AppColors.textSecondary;
     }
@@ -36,14 +34,11 @@ class ChartBox extends StatelessWidget {
     switch (status.toLowerCase()) {
       case "aman":
         return AppColors.amanBackground;
-
       case "waspada":
         return AppColors.waspadaBackground;
-
       case "siaga":
       case "bahaya":
         return AppColors.siagaBackground;
-
       default:
         return Colors.grey.shade200;
     }
@@ -119,22 +114,11 @@ class ChartBox extends StatelessWidget {
 
                       const SizedBox(height: 20),
 
-                      Container(
+                      SizedBox(
                         height: 240,
                         width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: AppColors.background,
-                          borderRadius: AppRadius.medium,
-                        ),
-                        child: const Center(
-                          child: Text(
-                            "Line Chart",
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: AppColors.textSecondary,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
+                        child: SensorTrendChart(
+                          history: history!.history,
                         ),
                       ),
                     ],

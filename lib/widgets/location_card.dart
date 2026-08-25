@@ -17,14 +17,11 @@ class LocationCard extends StatelessWidget {
     switch (lokasi.status.toLowerCase()) {
       case "aman":
         return AppColors.aman;
-
       case "waspada":
         return AppColors.waspada;
-
       case "siaga":
       case "bahaya":
         return AppColors.siaga;
-
       default:
         return AppColors.textSecondary;
     }
@@ -34,14 +31,11 @@ class LocationCard extends StatelessWidget {
     switch (lokasi.status.toLowerCase()) {
       case "aman":
         return AppColors.amanBackground;
-
       case "waspada":
         return AppColors.waspadaBackground;
-
       case "siaga":
       case "bahaya":
         return AppColors.siagaBackground;
-
       default:
         return Colors.grey.shade200;
     }
@@ -62,17 +56,50 @@ class LocationCard extends StatelessWidget {
           children: [
 
             Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
 
-                Expanded(
-                  child: Text(
-                    lokasi.namaLokasi,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                    ),
+                // Pin icon lingkaran
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: statusBackground,
+                  ),
+                  child: Icon(
+                    Icons.location_on_rounded,
+                    color: statusColor,
+                    size: 20,
                   ),
                 ),
+
+                const SizedBox(width: 12),
+
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        lokasi.namaLokasi,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        "Kelembaban ${lokasi.kelembaban}% • Curah Hujan ${lokasi.curahHujan} mm",
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(width: 8),
 
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -92,39 +119,46 @@ class LocationCard extends StatelessWidget {
                     ),
                   ),
                 ),
-
               ],
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 14),
 
-            Text(
-              "Status : ${lokasi.status}",
-              style: const TextStyle(
-                fontSize: 14,
-              ),
+            // Progress bar (memakai data kelembaban)
+            Row(
+              children: [
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: LinearProgressIndicator(
+                      value: lokasi.kelembaban / 100,
+                      backgroundColor: Colors.grey.shade200,
+                      color: statusColor,
+                      minHeight: 6,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  "${lokasi.kelembaban}%",
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: statusColor,
+                  ),
+                ),
+              ],
             ),
 
-            const SizedBox(height: 10),
-
-            Text(
-              "Kelembaban ${lokasi.kelembaban}% • Curah Hujan ${lokasi.curahHujan} mm",
-              style: const TextStyle(
-                fontSize: 13,
-                color: Colors.black54,
-              ),
-            ),
-
-            const SizedBox(height: 4),
+            const SizedBox(height: 8),
 
             Text(
               "Pergerakan Tanah : ${lokasi.pergerakanTanah}",
               style: const TextStyle(
-                fontSize: 13,
+                fontSize: 12,
                 color: Colors.black54,
               ),
             ),
-
           ],
         ),
       ),

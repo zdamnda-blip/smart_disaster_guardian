@@ -14,18 +14,35 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int currentIndex = 0;
+  bool scrollMapToSensorList = false;
 
-  final List<Widget> pages = const [
-    DashboardPage(),
-    MapPage(),
-    HistoryPage(),
-  ];
+  void _goToMonitoring({bool scrollToSensorList = false}) {
+    setState(() {
+      currentIndex = 1;
+      scrollMapToSensorList = scrollToSensorList;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final pages = [
+      DashboardPage(
+        onLihatSelengkapnya: () {
+          _goToMonitoring(scrollToSensorList: true);
+        },
+      ),
+      MapPage(
+        scrollToSensorList: scrollMapToSensorList,
+      ),
+      const HistoryPage(),
+    ];
+
     return Scaffold(
       body: SafeArea(
-        child: pages[currentIndex],
+        child: IndexedStack(
+          index: currentIndex,
+          children: pages,
+        ),
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: currentIndex,
@@ -49,9 +66,9 @@ class _HomePageState extends State<HomePage> {
             label: "Monitoring",
           ),
           NavigationDestination(
-            icon: Icon(Icons.warning_amber_outlined),
-            selectedIcon: Icon(Icons.warning),
-            label: "Peringatan",
+            icon: Icon(Icons.info_outlined),
+            selectedIcon: Icon(Icons.info),
+            label: "Informasi",
           ),
         ],
       ),

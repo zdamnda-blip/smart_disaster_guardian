@@ -12,7 +12,12 @@ import '../widgets/map_area.dart';
 import '../widgets/sensor_list.dart';
 
 class MapPage extends StatefulWidget {
-  const MapPage({super.key});
+  final bool scrollToSensorList;
+
+  const MapPage({
+    super.key,
+    this.scrollToSensorList = false,
+  });
 
   @override
   State<MapPage> createState() => _MapPageState();
@@ -26,6 +31,9 @@ class _MapPageState extends State<MapPage> {
 
   Timer? refreshTimer;
 
+  final GlobalKey sensorListKey = GlobalKey();
+  bool _hasScrolledToSensorList = false;
+
   @override
   void initState() {
     super.initState();
@@ -38,6 +46,16 @@ class _MapPageState extends State<MapPage> {
         loadSensors();
       },
     );
+  }
+
+  @override
+  void didUpdateWidget(covariant MapPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.scrollToSensorList && !oldWidget.scrollToSensorList) {
+      _hasScrolledToSensorList = false;
+      _maybeScrollToSensorList();
+    }
   }
 
   Future<void> loadSensors() async {
@@ -54,6 +72,8 @@ class _MapPageState extends State<MapPage> {
       if (selectedSensorId != null) {
         loadSensorHistory(selectedSensorId!);
       }
+
+      _maybeScrollToSensorList();
     } catch (e) {
       if (!mounted) return;
 
@@ -61,6 +81,22 @@ class _MapPageState extends State<MapPage> {
         errorMessage = e.toString();
       });
     }
+  }
+
+  void _maybeScrollToSensorList() {
+    if (!widget.scrollToSensorList || _hasScrolledToSensorList) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final context = sensorListKey.currentContext;
+      if (context != null) {
+        Scrollable.ensureVisible(
+          context,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+        _hasScrolledToSensorList = true;
+      }
+    });
   }
 
   Future<void> loadSensorHistory(int sensorId) async {
@@ -172,8 +208,9 @@ class _MapPageState extends State<MapPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const AppBanner(
-                  title: "Monitoring",
+                  title: "Smart Disaster\nGuardian",
                   image: "assets/images/map_banner.jpeg",
+                  badge: "MONITORING",
                 ),
 
                 MapArea(
@@ -193,6 +230,7 @@ class _MapPageState extends State<MapPage> {
                 const SizedBox(height: 24),
 
                 SensorList(
+                  key: sensorListKey,
                   sensors: sensors,
                   selectedSensorId: selectedSensorId,
                   onSensorTap: (sensor) {

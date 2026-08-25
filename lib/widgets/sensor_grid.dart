@@ -18,23 +18,24 @@ class SensorGrid extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          "Ringkasan Sensor",
+          "RINGKASAN NILAI RATA-RATA SENSOR",
           style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textSecondary,
+                letterSpacing: 1,
           ),
         ),
 
         const SizedBox(height: 16),
 
         GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
+          crossAxisCount: 4,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          childAspectRatio: 1.15,
+          childAspectRatio: 0.85,
           children: [
             SensorItem(
               title: "Kelembaban Tanah",

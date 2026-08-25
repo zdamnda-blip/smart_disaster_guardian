@@ -79,18 +79,51 @@ class SensorCard extends StatelessWidget {
               children: [
 
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
 
-                    Expanded(
-                      child: Text(
-                        "Sensor ${sensor.id} - ${sensor.namaLokasi}",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
+                    // Icon lingkaran
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: statusBackground,
+                      ),
+                      child: Icon(
+                        Icons.location_on_rounded,
+                        color: statusColor,
+                        size: 20,
                       ),
                     ),
+
+                    const SizedBox(width: 12),
+
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Sensor ${sensor.id} - ${sensor.namaLokasi}",
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "Kelembaban ${sensor.kelembabanTanah}% • Hujan ${sensor.curahHujan} mm",
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(width: 8),
 
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -114,14 +147,40 @@ class SensorCard extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
+
+                // Progress bar (memakai data kelembabanTanah)
+                Row(
+                  children: [
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: LinearProgressIndicator(
+                          value: sensor.kelembabanTanah / 100,
+                          backgroundColor: Colors.grey.shade200,
+                          color: statusColor,
+                          minHeight: 6,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      "${sensor.kelembabanTanah}%",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: statusColor,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 8),
 
                 Text(
-                  "Kelembaban ${sensor.kelembabanTanah}% • "
-                  "Hujan ${sensor.curahHujan} mm • "
                   "Gerakan: ${sensor.pergerakanTanah}",
                   style: const TextStyle(
-                    fontSize: 13,
+                    fontSize: 12,
                     color: AppColors.textSecondary,
                   ),
                 ),

@@ -153,8 +153,9 @@ class _HistoryPageState extends State<HistoryPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const AppBanner(
-                  title: "Peringatan",
-                  image: "assets/images/banner_history.jpg",
+                   title: "Smart Disaster\nGuardian",
+                   image: "assets/images/history_banner.jpeg",
+                   badge: "INFORMASI",
                 ),
 
                 HistoryList(

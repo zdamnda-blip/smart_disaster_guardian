@@ -19,47 +19,58 @@ class SensorItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: AppRadius.medium,
         boxShadow: AppShadows.soft,
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-            width: 42,
-            height: 42,
+            width: 38,
+            height: 38,
             decoration: BoxDecoration(
-              color: AppColors.accent,
-              borderRadius: AppRadius.medium,
+              shape: BoxShape.circle,
+              color: Colors.transparent,
+              border: Border.all(
+                color: AppColors.primary,
+                width: 1.5,
+              ),
             ),
             child: Icon(
               icon,
               color: AppColors.primary,
-              size: 22,
+              size: 18,
             ),
           ),
 
-          const Spacer(),
-
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-            ),
-          ),
-
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
 
           Text(
             title,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 10,
+              color: AppColors.textSecondary,
+            ),
+          ),
+
+          const SizedBox(height: 2),
+
+          Text(
+            value,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               fontSize: 13,
-              color: AppColors.textSecondary,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
             ),
           ),
         ],

@@ -16,160 +16,122 @@ class StatusCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color badgeColor;
-    Color badgeBackground;
+    IconData statusIcon;
 
     switch (dashboard.status.toLowerCase()) {
       case "aman":
         badgeColor = AppColors.aman;
-        badgeBackground = AppColors.amanBackground;
+        statusIcon = Icons.check_circle_rounded;
         break;
 
       case "waspada":
         badgeColor = AppColors.waspada;
-        badgeBackground = AppColors.waspadaBackground;
+        statusIcon = Icons.warning_rounded;
         break;
 
       default:
         badgeColor = AppColors.siaga;
-        badgeBackground = AppColors.siagaBackground;
+        statusIcon = Icons.warning_rounded;
     }
 
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            badgeColor,
+            badgeColor.withOpacity(0.75),
+          ],
+        ),
         borderRadius: AppRadius.large,
         boxShadow: AppShadows.medium,
       ),
-      child: Stack(
-        children: [
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
 
-          Positioned(
-            right: 0,
-            bottom: 0,
-            child: Opacity(
-              opacity: 0.18,
-              child: Image.asset(
-                "assets/images/mountain.jpeg",
-                width: 130,
-              ),
-            ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            // Icon + Status besar
+            Row(
               children: [
-
-                const Text(
-                  "Status",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: badgeBackground,
-                    borderRadius: AppRadius.pill,
+                    color: Colors.white.withOpacity(0.25),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(
-                    dashboard.status,
-                    style: TextStyle(
-                      color: badgeColor,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  child: Icon(
+                    statusIcon,
+                    color: Colors.white,
+                    size: 22,
                   ),
                 ),
 
-                const SizedBox(height: 18),
-
-                Row(
-                  children: [
-
-                    const Icon(
-                      Icons.location_on_rounded,
-                      color: AppColors.primary,
-                      size: 18,
-                    ),
-
-                    const SizedBox(width: 6),
-
-                    Expanded(
-                      child: Text(
-                        dashboard.lokasi,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 15,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 14),
-
-                const Text(
-                  "Rekomendasi",
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-
-                const SizedBox(height: 4),
+                const SizedBox(width: 12),
 
                 Text(
-                  dashboard.rekomendasi,
+                  dashboard.status,
                   style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 24,
                   ),
                 ),
-
-                const SizedBox(height: 18),
-
-                Divider(
-                  color: AppColors.divider,
-                ),
-
-                const SizedBox(height: 12),
-
-                Row(
-                  children: [
-
-                    const Icon(
-                      Icons.access_time_filled_rounded,
-                      color: AppColors.primary,
-                      size: 18,
-                    ),
-
-                    const SizedBox(width: 8),
-
-                    Expanded(
-                      child: Text(
-                        dashboard.updateTerakhir,
-                        style: const TextStyle(
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ),
-
-                  ],
-                ),
-
               ],
             ),
-          ),
-        ],
+
+            const SizedBox(height: 16),
+
+            // Lokasi
+            Row(
+              children: [
+                const Icon(
+                  Icons.location_on_rounded,
+                  color: Colors.white,
+                  size: 16,
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    "Lokasi: ${dashboard.lokasi}",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 8),
+
+            // Update terakhir
+            Row(
+              children: [
+                const Icon(
+                  Icons.access_time_rounded,
+                  color: Colors.white,
+                  size: 16,
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    "Update Terakhir ${dashboard.updateTerakhir}",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -6,10 +6,12 @@ import 'location_card.dart';
 
 class LocationSection extends StatelessWidget {
   final DashboardModel dashboard;
+  final VoidCallback? onLihatSelengkapnya;
 
   const LocationSection({
     super.key,
     required this.dashboard,
+    this.onLihatSelengkapnya,
   });
 
   @override
@@ -18,14 +20,31 @@ class LocationSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
 
-        const Text(
-          "LOKASI BERISIKO",
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textSecondary,
-            letterSpacing: 1,
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              "LOKASI BERISIKO",
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textSecondary,
+                letterSpacing: 1,
+              ),
+            ),
+
+            GestureDetector(
+              onTap: onLihatSelengkapnya,
+              child: const Text(
+                "Lihat Selengkapnya",
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
+          ],
         ),
 
         const SizedBox(height: 12),

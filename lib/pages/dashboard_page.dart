@@ -1,4 +1,3 @@
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -12,7 +11,12 @@ import '../widgets/sensor_grid.dart';
 import '../widgets/status_card.dart';
 
 class DashboardPage extends StatefulWidget {
-  const DashboardPage({super.key});
+  final VoidCallback? onLihatSelengkapnya;
+
+  const DashboardPage({
+    super.key,
+    this.onLihatSelengkapnya,
+  });
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
@@ -167,13 +171,18 @@ class _DashboardPageState extends State<DashboardPage> {
                 const AppBanner(
                   title: "Smart Disaster\nGuardian",
                   image: "assets/images/dashboard_banner.jpeg",
+                  badge: "DASHBOARD",
+                  showLiveIndicator: true,
                 ),
 
-                StatusCard(
-                  dashboard: dashboard!,
+                Transform.translate(
+                  offset: const Offset(0, -40),
+                  child: StatusCard(
+                    dashboard: dashboard!,
+                  ),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 4),
 
                 SensorGrid(
                   dashboard: dashboard!,
@@ -183,6 +192,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
                 LocationSection(
                   dashboard: dashboard!,
+                  onLihatSelengkapnya: widget.onLihatSelengkapnya,
                 ),
 
                 const SizedBox(height: 30),
