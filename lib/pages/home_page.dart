@@ -35,9 +35,14 @@ class _HomePageState extends State<HomePage> {
       ),
       MapPage(
         scrollToSensorList: scrollMapToSensorList,
+        onBack: () => setState(() => currentIndex = 0),
       ),
-      const HistoryPage(),
-      const ReportPage(),
+      HistoryPage(
+        onBack: () => setState(() => currentIndex = 0),
+      ),
+      ReportPage(
+        onBack: () => setState(() => currentIndex = 0),
+      ),
     ];
 
     return Scaffold(
@@ -54,7 +59,7 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.white,
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-        child: const Icon(Icons.smart_toy, color: AppColors.primary),
+        child: _buildChatbotIcon(),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       bottomNavigationBar: NavigationBar(
@@ -84,11 +89,22 @@ class _HomePageState extends State<HomePage> {
             label: "Informasi",
           ),
           NavigationDestination(
-            icon: Icon(Icons.assignment_outlined),
-            selectedIcon: Icon(Icons.assignment, color: AppColors.primary),
+            icon: Icon(Icons.book_outlined),
+            selectedIcon: Icon(Icons.book, color: AppColors.primary),
             label: "Laporan",
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildChatbotIcon() {
+    return ClipOval(
+      child: Image.asset(
+        "assets/images/logo_chatbot.jpeg",
+        width: 50,
+        height: 50,
+        fit: BoxFit.cover,
       ),
     );
   }

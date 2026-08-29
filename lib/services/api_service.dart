@@ -7,33 +7,60 @@ import '../models/history_model.dart';
 import '../models/history_point_model.dart';
 import '../models/sensor_history_model.dart';
 import '../models/sensor_model.dart';
+import '../models/location_model.dart';
+import 'dummy_data.dart';
 
 class ApiService {
-  static const String baseUrl =
-    "https://undusted-vagrantly-fountain.ngrok-free.dev";
+  static const String baseUrl = "https://undusted-vagrantly-fountain.ngrok-free.dev";
 
-     static const Map<String, String> headers = {
-    "ngrok-skip-browser-warning": "true",
-    "Accept": "application/json",
-  };
+  static Map<String, String> get headers => {
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "69420",
+      };
+
   /// ===========================
-  /// DASHBOARD 
+  /// DASHBOARD (MOBILE)
   /// ===========================
 
   static Future<DashboardModel> getDashboard() async {
-    await Future.delayed(const Duration(seconds: 1)); // Simulate network
+    await Future.delayed(const Duration(milliseconds: 500)); // Simulate network
     
-    // MOCK DATA:
-    return const DashboardModel(
-      status: "Aman",
-      lokasi: "Nupa Bomaba KM 8",
-      rekomendasi: "Semua sistem dalam kondisi aman. Tetap lakukan pemantauan rutin.",
+    // Calculate averages
+    final sensors = DummyData.sensors;
+    int activeSensors = sensors.where((s) => s['isActive'] == true).length;
+    
+    double avgKelembaban = sensors.fold(0.0, (sum, s) => sum + (s['kelembabanTanah'] as double)) / sensors.length;
+    double avgCurahHujan = sensors.fold(0.0, (sum, s) => sum + (s['curahHujan'] as double)) / sensors.length;
+    bool adaPergerakan = sensors.any((s) => s['pergerakanTanah'] != 'Stabil');
+
+    List<LocationModel> berisiko = sensors
+        .where((s) => s['status'].toLowerCase() != 'aman')
+        .map<LocationModel>((s) => LocationModel(
+              namaLokasi: s['name'].toString().split(' - ').last,
+              status: s['status'],
+              kelembaban: (s['kelembabanTanah'] as num).toDouble(),
+              curahHujan: (s['curahHujan'] as num).toDouble(),
+              pergerakanTanah: s['pergerakanTanah'].toString(),
+            ))
+        .toList();
+
+    String topStatus = "Aman";
+    if (berisiko.any((s) => s.status.toLowerCase() == 'bahaya')) {
+      topStatus = "Bahaya";
+    } else if (berisiko.any((s) => s.status.toLowerCase() == 'waspada')) {
+      topStatus = "Waspada";
+    }
+    
+    return DashboardModel(
+      status: topStatus,
+      lokasi: "Sistem Pemantauan Terpadu",
+      rekomendasi: topStatus == "Aman" ? "Semua sistem dalam kondisi aman. Tetap lakukan pemantauan rutin." : "Harap waspada, terdeteksi status berisiko.",
       updateTerakhir: "Baru saja",
-      kelembabanTanah: 25.5,
-      curahHujan: 12.0,
-      pergerakanTanah: "Stabil",
-      sensorAktif: "3/3",
-      lokasiBerisiko: [],
+      kelembabanTanah: avgKelembaban,
+      curahHujan: avgCurahHujan,
+      pergerakanTanah: adaPergerakan ? "Terdeteksi" : "Stabil",
+      sensorAktif: "$activeSensors/${sensors.length}",
+      lokasiBerisiko: berisiko,
     );
   }
 
@@ -42,14 +69,17 @@ class ApiService {
   /// ===========================
 
   static Future<List<SensorModel>> getSensors() async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(milliseconds: 500));
     
     // MOCK DATA:
-    return [
-      const SensorModel(id: 1, namaLokasi: "Sensor 1 - Nupa Bomaba KM 8", status: "Aman", kelembabanTanah: 20, curahHujan: 5, pergerakanTanah: "Stabil"),
-      const SensorModel(id: 2, namaLokasi: "Sensor 2 - Wentira KM 23", status: "Aman", kelembabanTanah: 22, curahHujan: 10, pergerakanTanah: "Stabil"),
-      const SensorModel(id: 3, namaLokasi: "Sensor 3 - Toboli KM 34", status: "Aman", kelembabanTanah: 25, curahHujan: 0, pergerakanTanah: "Stabil"),
-    ];
+    return DummyData.sensors.map((s) => SensorModel(
+      id: s['id'],
+      namaLokasi: s['name'],
+      status: s['status'],
+      kelembabanTanah: s['kelembabanTanah'],
+      curahHujan: s['curahHujan'],
+      pergerakanTanah: s['pergerakanTanah'],
+    )).toList();
   }
 
   /// ===========================
@@ -59,7 +89,7 @@ class ApiService {
   static Future<SensorHistoryModel> getSensorHistory(
     int sensorId,
   ) async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(milliseconds: 500));
     
     // MOCK DATA:
     return SensorHistoryModel(
@@ -79,25 +109,25 @@ class ApiService {
   /// ===========================
 
   static Future<List<HistoryModel>> getHistory() async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(milliseconds: 500));
     
-    // MOCK DATA:
-    return [
-      const HistoryModel(
-        id: 1,
-        lokasi: "Nupa Bomaba KM 8",
-        status: "Bahaya",
-        deskripsi: "Pergerakan tanah tinggi.",
-        waktu: "2026-08-08 14:00:00",
-      ),
-      const HistoryModel(
-        id: 2,
-        lokasi: "Wentira KM 23",
-        status: "Waspada",
-        deskripsi: "Curah hujan meningkat.",
-        waktu: "2026-08-07 09:15:00",
-      ),
-    ];
+    // MOCK DATA LOGIC:
+    var sortedWarnings = List<Map<String, dynamic>>.from(DummyData.warnings);
+    sortedWarnings.sort((a, b) => DateTime.parse(b['waktu']).compareTo(DateTime.parse(a['waktu'])));
+    
+    if (sortedWarnings.isEmpty) return [];
+
+    DateTime latestTime = DateTime.parse(sortedWarnings.first['waktu']);
+    if (DateTime.now().difference(latestTime).inHours >= 10) {
+      return []; // Return empty so UI shows "tidak ada Riwayat terbaru"
+    }
+
+    return sortedWarnings.take(3).map((w) => HistoryModel(
+      id: w['id'],
+      lokasi: w['lokasi'],
+      status: w['jenis'],
+      deskripsi: w['pesan'],
+      waktu: w['waktu'],
+    )).toList();
   }
 }
-

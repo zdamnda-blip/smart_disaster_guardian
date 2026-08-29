@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 
+import '../services/dummy_data.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_shadows.dart';
 
 class ReportPage extends StatefulWidget {
-  const ReportPage({super.key});
+  final VoidCallback? onBack;
+
+  const ReportPage({
+    super.key,
+    this.onBack,
+  });
 
   @override
   State<ReportPage> createState() => _ReportPageState();
@@ -22,6 +28,7 @@ class _ReportPageState extends State<ReportPage> {
   final _deskripsiController = TextEditingController();
 
   String _tingkatBahaya = 'Tinggi';
+  DateTime? _selectedDate;
 
   @override
   void dispose() {
@@ -35,10 +42,33 @@ class _ReportPageState extends State<ReportPage> {
 
   void _kirimLaporan() {
     if (_formKey.currentState!.validate()) {
-      // Mock logic to send report
+      if (_selectedDate == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Silakan pilih waktu kejadian')),
+        );
+        return;
+      }
+
+      // Append current time to the selected date for Admin's view
+      final now = TimeOfDay.now();
+      final waktuWithTime = "${_waktuController.text}, ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
+
+      // Add to Dummy Data
+      DummyData.reports.add({
+        "id": DateTime.now().millisecondsSinceEpoch,
+        "tingkatBahaya": _tingkatBahaya,
+        "waktu": waktuWithTime,
+        "deskripsi": _deskripsiController.text,
+        "lokasi": _lokasiController.text,
+        "pelapor": _namaController.text,
+        "telepon": _teleponController.text,
+        "status": "Baru", 
+        "catatan": null,
+      });
       
       showDialog(
         context: context,
+        barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
             shape: RoundedRectangleBorder(borderRadius: AppRadius.large),
@@ -48,11 +78,52 @@ class _ReportPageState extends State<ReportPage> {
                 const Icon(Icons.check_circle_outline, color: AppColors.primary, size: 48),
                 const SizedBox(height: 16),
                 const Text("Laporan Terkirim", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Close dialog
+                    
+                    // Reset form instead of popping the page since ReportPage is in IndexedStack
+                    _formKey.currentState!.reset();
+                    _namaController.clear();
+                    _teleponController.clear();
+                    _lokasiController.clear();
+                    _waktuController.clear();
+                    _deskripsiController.clear();
+                    setState(() {
+                      _tingkatBahaya = 'Tinggi';
+                      _selectedDate = null;
+                    });
+                  },
+                  child: const Text("Tutup"),
+                )
               ],
             ),
           );
         },
       );
+    }
+  }
+
+  void _setAutoLocation() {
+    setState(() {
+      _lokasiController.text = "Lokasi Saya Saat Ini (Latitude, Longitude)";
+    });
+  }
+
+  Future<void> _pickDateTime() async {
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+    );
+    
+    if (pickedDate != null) {
+      setState(() {
+        _selectedDate = pickedDate;
+        _waktuController.text = "${pickedDate.day.toString().padLeft(2, '0')}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.year}";
+      });
     }
   }
   
@@ -64,7 +135,7 @@ class _ReportPageState extends State<ReportPage> {
         backgroundColor: AppColors.primary,
         leading: IconButton(
           icon: const Icon(Icons.chevron_left, color: Colors.white, size: 30),
-          onPressed: () {},
+          onPressed: widget.onBack ?? () {},
         ),
         title: const Text(
           'LAPORAN', 
@@ -124,18 +195,38 @@ class _ReportPageState extends State<ReportPage> {
                     const SizedBox(height: 24),
                     
                     _buildLabel("Nama Pelapor"),
-                    _buildTextField(_namaController, "Masukkan nama lengkap"),
+                    _buildTextField(
+                      _namaController, 
+                      "Masukkan nama lengkap",
+                      validator: (value) {
+                        if (value == null || value.isEmpty) return 'Field ini wajib diisi';
+                        if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) return 'Hanya huruf yang diperbolehkan';
+                        return null;
+                      },
+                    ),
                     const SizedBox(height: 16),
                     
                     _buildLabel("Nomor Telepon"),
-                    _buildTextField(_teleponController, "Masukkan nomor telepon", keyboardType: TextInputType.phone),
+                    _buildTextField(
+                      _teleponController, 
+                      "Masukkan nomor telepon", 
+                      keyboardType: TextInputType.phone,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) return 'Field ini wajib diisi';
+                        if (!RegExp(r'^[0-9]+$').hasMatch(value)) return 'Hanya angka yang diperbolehkan';
+                        return null;
+                      },
+                    ),
                     const SizedBox(height: 16),
                     
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _buildLabel("Lokasi Kejadian"),
-                        const Text("Gunakan lokasi Anda", style: TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.bold)),
+                        GestureDetector(
+                          onTap: _setAutoLocation,
+                          child: const Text("Gunakan lokasi Anda", style: TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.bold)),
+                        ),
                       ],
                     ),
                     _buildTextField(_lokasiController, "Masukkan lokasi kejadian"),
@@ -154,7 +245,7 @@ class _ReportPageState extends State<ReportPage> {
                     const SizedBox(height: 16),
                     
                     _buildLabel("Waktu Kejadian"),
-                    _buildTextField(_waktuController, "DD-MM-YYYY", suffixIcon: Icons.calendar_today),
+                    _buildDateField(),
                     const SizedBox(height: 16),
                     
                     _buildLabel("Deskripsi Laporan"),
@@ -165,8 +256,6 @@ class _ReportPageState extends State<ReportPage> {
                     const SizedBox(height: 8),
                     
                     // TODO: Implement image_picker here
-                    // Nanti kita gunakan package image_picker untuk mengambil foto
-                    // dari kamera/galeri lalu dikirim ke API melalui MultipartRequest
                     Container(
                       width: double.infinity,
                       height: 100,
@@ -214,7 +303,7 @@ class _ReportPageState extends State<ReportPage> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String hint, {int maxLines = 1, TextInputType? keyboardType, IconData? suffixIcon}) {
+  Widget _buildTextField(TextEditingController controller, String hint, {int maxLines = 1, TextInputType? keyboardType, String? Function(String?)? validator}) {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
@@ -235,9 +324,35 @@ class _ReportPageState extends State<ReportPage> {
           borderRadius: AppRadius.medium,
           borderSide: const BorderSide(color: AppColors.primary),
         ),
-        suffixIcon: suffixIcon != null ? Icon(suffixIcon, color: AppColors.textSecondary, size: 20) : null,
       ),
-      validator: (value) => value == null || value.isEmpty ? 'Field ini wajib diisi' : null,
+      validator: validator ?? (value) => value == null || value.isEmpty ? 'Field ini wajib diisi' : null,
+    );
+  }
+  
+  Widget _buildDateField() {
+    return TextFormField(
+      controller: _waktuController,
+      readOnly: true,
+      onTap: _pickDateTime,
+      decoration: InputDecoration(
+        hintText: "DD-MM-YYYY, HH:MM",
+        hintStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        border: OutlineInputBorder(
+          borderRadius: AppRadius.medium,
+          borderSide: const BorderSide(color: AppColors.divider),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: AppRadius.medium,
+          borderSide: const BorderSide(color: AppColors.divider),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: AppRadius.medium,
+          borderSide: const BorderSide(color: AppColors.primary),
+        ),
+        suffixIcon: const Icon(Icons.calendar_today, color: AppColors.textSecondary, size: 20),
+      ),
+      validator: (value) => value == null || value.isEmpty ? 'Waktu kejadian wajib diisi' : null,
     );
   }
 
@@ -268,4 +383,3 @@ class _ReportPageState extends State<ReportPage> {
     );
   }
 }
-

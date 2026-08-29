@@ -19,6 +19,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
   
   int _failedAttempts = 0;
   bool _isLocked = false;
+  bool _isPasswordVisible = false;
   
   void _login() {
     if (_isLocked) return;
@@ -90,7 +91,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                 const SizedBox(height: 16),
                 
                 _buildLabel("Kata Sandi"),
-                _buildTextField(_passwordController, "Masukkan kata sandi", obscureText: true, enabled: !_isLocked),
+                _buildPasswordField(),
                 
                 if (_failedAttempts > 0 && !_isLocked) ...[
                   const SizedBox(height: 16),
@@ -187,6 +188,43 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
         focusedBorder: OutlineInputBorder(
           borderRadius: AppRadius.medium,
           borderSide: const BorderSide(color: AppColors.primary),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return TextField(
+      controller: _passwordController,
+      obscureText: !_isPasswordVisible,
+      enabled: !_isLocked,
+      decoration: InputDecoration(
+        hintText: "Masukkan kata sandi",
+        hintStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        border: OutlineInputBorder(
+          borderRadius: AppRadius.medium,
+          borderSide: const BorderSide(color: AppColors.divider),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: AppRadius.medium,
+          borderSide: const BorderSide(color: AppColors.divider),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: AppRadius.medium,
+          borderSide: const BorderSide(color: AppColors.primary),
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+            color: AppColors.textSecondary,
+            size: 20,
+          ),
+          onPressed: () {
+            setState(() {
+              _isPasswordVisible = !_isPasswordVisible;
+            });
+          },
         ),
       ),
     );

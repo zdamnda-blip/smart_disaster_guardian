@@ -16,20 +16,46 @@ class StatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (dashboard.status.toLowerCase() == "aman" || dashboard.lokasiBerisiko.isEmpty) {
+    if (dashboard.lokasiBerisiko.isEmpty) {
       return _buildAmanCard();
     }
 
+    final bahayaSensors = dashboard.lokasiBerisiko.where((s) => s.status.toLowerCase() == "bahaya").toList();
+    final waspadaSensors = dashboard.lokasiBerisiko.where((s) => s.status.toLowerCase() == "waspada").toList();
+    
+    List<Widget> cards = [];
+    if (bahayaSensors.isNotEmpty) {
+      String names = bahayaSensors.map((s) => s.namaLokasi.split(' - ').last).join(', ');
+      cards.add(_buildRiskCard("Bahaya", names, dashboard.updateTerakhir));
+    }
+    if (waspadaSensors.isNotEmpty) {
+      String names = waspadaSensors.map((s) => s.namaLokasi.split(' - ').last).join(', ');
+      cards.add(_buildRiskCard("Waspada", names, dashboard.updateTerakhir));
+    }
+
+    // Fallback just in case, though it shouldn't be reached if isEmpty is handled above
+    if (cards.isEmpty) return _buildAmanCard(); 
+
     return SizedBox(
-      height: 120, // Adjusted height for side-scrolling cards
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: dashboard.lokasiBerisiko.length,
-        separatorBuilder: (context, index) => const SizedBox(width: 12),
-        itemBuilder: (context, index) {
-          return _buildRiskCard(dashboard.lokasiBerisiko[index], dashboard.updateTerakhir);
-        },
-      ),
+      height: 140, // Increased height slightly to fit 2 lines of location if split
+      child: cards.length == 1
+          ? SizedBox(
+              width: double.infinity,
+              child: _buildRiskCard(
+                  bahayaSensors.isNotEmpty ? "Bahaya" : "Waspada", 
+                  bahayaSensors.isNotEmpty 
+                      ? bahayaSensors.map((s) => s.namaLokasi.split(' - ').last).join(', ')
+                      : waspadaSensors.map((s) => s.namaLokasi.split(' - ').last).join(', '), 
+                  dashboard.updateTerakhir,
+                  isExpanded: true),
+            )
+          : Row(
+              children: [
+                Expanded(child: cards[0]),
+                const SizedBox(width: 12),
+                Expanded(child: cards[1]),
+              ],
+            ),
     );
   }
 
@@ -88,12 +114,12 @@ class StatusCard extends StatelessWidget {
     );
   }
 
-  Widget _buildRiskCard(LocationModel location, String updateTime) {
-    Color cardColor = location.status.toLowerCase() == "bahaya" ? AppColors.siaga : AppColors.waspada;
-    IconData iconData = location.status.toLowerCase() == "bahaya" ? Icons.warning_rounded : Icons.warning_amber_rounded;
+  Widget _buildRiskCard(String status, String locationNames, String updateTime, {bool isExpanded = false}) {
+    Color cardColor = status.toLowerCase() == "bahaya" ? AppColors.siaga : AppColors.waspada;
+    IconData iconData = status.toLowerCase() == "bahaya" ? Icons.warning_rounded : Icons.warning_amber_rounded;
 
     return Container(
-      width: 200, // Fixed width for horizontal scrolling
+      width: isExpanded ? double.infinity : null, // Take full width if expanded, else use flexible space in Row
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: cardColor,
@@ -107,13 +133,16 @@ class StatusCard extends StatelessWidget {
             children: [
               Icon(iconData, color: Colors.white, size: 22),
               const SizedBox(width: 8),
-              Text(
-                location.status.toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  letterSpacing: 1,
+              Expanded(
+                child: Text(
+                  status.toUpperCase(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16, // Adjusted slightly to fit in side-by-side
+                    letterSpacing: 1,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -126,22 +155,22 @@ class StatusCard extends StatelessWidget {
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
-                  "Lokasi : ${location.namaLokasi}",
-                  style: const TextStyle(color: Colors.white, fontSize: 12, height: 1.2),
-                  maxLines: 2,
+                  "Lokasi : $locationNames",
+                  style: const TextStyle(color: Colors.white, fontSize: 11, height: 1.2), // Smaller text to fit side-by-side
+                  maxLines: 3, // Allowed 3 lines for narrow cards
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          const Spacer(), // Push time to bottom
           Row(
             children: [
-              const Icon(Icons.access_time_rounded, color: Colors.white, size: 14),
+              const Icon(Icons.access_time_rounded, color: Colors.white, size: 12), // Smaller time icon
               const SizedBox(width: 4),
               Text(
                 updateTime, // Or location-specific time if available
-                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
+                style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w500),
               ),
             ],
           ),

@@ -13,10 +13,12 @@ import '../widgets/sensor_list.dart';
 
 class MapPage extends StatefulWidget {
   final bool scrollToSensorList;
+  final VoidCallback? onBack;
 
   const MapPage({
     super.key,
     this.scrollToSensorList = false,
+    this.onBack,
   });
 
   @override
@@ -202,9 +204,7 @@ class _MapPageState extends State<MapPage> {
         backgroundColor: AppColors.primary,
         leading: IconButton(
           icon: const Icon(Icons.chevron_left, color: Colors.white, size: 30),
-          onPressed: () {
-            // Since it's in a bottom nav, back could mean nothing or go to Dashboard
-          },
+          onPressed: widget.onBack ?? () {},
         ),
         title: const Text(
           "MONITORING",

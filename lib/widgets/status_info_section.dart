@@ -26,24 +26,17 @@ class StatusInfoSection extends StatelessWidget {
 
         const StatusInfoCard(
           status: "Aman",
-          deskripsi:
-              "Kelembaban tanah ≤65% dan curah hujan ≤25 mm",
+          deskripsi: "Kelembapan tanah < 25% dan curah hujan < 31 mm",
         ),
-
         const SizedBox(height: 12),
-
         const StatusInfoCard(
           status: "Waspada",
-          deskripsi:
-              "Kelembaban tanah >65% atau curah hujan >25 mm",
+          deskripsi: "Kelembapan tanah < 85 % dan curah hujan < 70 mm",
         ),
-
         const SizedBox(height: 12),
-
         const StatusInfoCard(
           status: "Bahaya",
-          deskripsi:
-              "Kelembaban tanah >80% atau curah hujan >45 mm",
+          deskripsi: "Kelembapan tanah > 85% dan curah hujan > 70 mm",
         ),
 
       ],

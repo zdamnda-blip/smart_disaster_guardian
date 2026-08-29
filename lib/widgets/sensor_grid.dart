@@ -39,12 +39,12 @@ class SensorGrid extends StatelessWidget {
           children: [
             SensorItem(
               title: "Kelembaban Tanah",
-              value: "${dashboard.kelembabanTanah}%",
+              value: "${dashboard.kelembabanTanah.toInt()}%",
               icon: Icons.water_drop_outlined,
             ),
             SensorItem(
               title: "Curah Hujan",
-              value: "${dashboard.curahHujan} mm",
+              value: "${dashboard.curahHujan.toInt()} mm",
               icon: Icons.cloud_outlined,
             ),
             SensorItem(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../services/dummy_data.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_radius.dart';
 import '../../theme/app_shadows.dart';
@@ -13,27 +14,8 @@ class AdminSensorPage extends StatefulWidget {
 }
 
 class _AdminSensorPageState extends State<AdminSensorPage> {
-  // TODO: HAPUS DUMMY DATA INI SAAT BACKEND SIAP
-  final List<Map<String, dynamic>> _sensors = [
-    {
-      "id": 1,
-      "name": "Sensor 1 - Nupa Bomaba KM 8",
-      "isActive": true,
-      "reason": null,
-    },
-    {
-      "id": 2,
-      "name": "Sensor 2 - Wentira KM 23",
-      "isActive": true,
-      "reason": null,
-    },
-    {
-      "id": 3,
-      "name": "Sensor 3 - Toboli KM 34",
-      "isActive": false,
-      "reason": "Kerusakan kabel sensor, menunggu perbaikan",
-    },
-  ];
+  // Use data from DummyData
+  List<Map<String, dynamic>> get _sensors => DummyData.sensors;
 
   void _toggleSensor(int index, bool currentValue) {
     if (currentValue) {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_shadows.dart';
+import '../services/dummy_data.dart';
 
 class AnnouncementSection extends StatelessWidget {
   const AnnouncementSection({super.key});
@@ -30,19 +31,26 @@ class AnnouncementSection extends StatelessWidget {
             borderRadius: AppRadius.large,
             boxShadow: AppShadows.soft,
           ),
-          child: Column(
-            children: [
-              _buildAnnouncementItem(
-                "Telah terjadi longsor pada KM 8 yang mengakibatkan pohon tumbang menutupi jalan",
-                "09-08-2026 09.30",
-              ),
-              const Divider(color: AppColors.divider, height: 24),
-              _buildAnnouncementItem(
-                "Evakuasi darurat di jalur NUPA BOMBA KM 8 - Berlaku buka tutup jalan mulai pukul 10.00",
-                "09-08-2026 09.45",
-              ),
-            ],
-          ),
+          child: DummyData.announcements.isEmpty
+              ? const Text("Tidak ada pengumuman", style: TextStyle(color: AppColors.textSecondary))
+              : Column(
+                  children: List.generate(
+                    DummyData.announcements.length,
+                    (index) {
+                      final ann = DummyData.announcements[index];
+                      return Column(
+                        children: [
+                          _buildAnnouncementItem(
+                            ann['text'] ?? "",
+                            ann['date'] ?? "",
+                          ),
+                          if (index < DummyData.announcements.length - 1)
+                            const Divider(color: AppColors.divider, height: 24),
+                        ],
+                      );
+                    },
+                  ),
+                ),
         ),
       ],
     );

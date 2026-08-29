@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../services/dummy_data.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_radius.dart';
 import '../../theme/app_shadows.dart';
@@ -15,20 +16,7 @@ class AdminReportPage extends StatefulWidget {
 class _AdminReportPageState extends State<AdminReportPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   
-  // TODO: HAPUS DUMMY DATA INI SAAT BACKEND SIAP
-  final List<Map<String, dynamic>> _reports = [
-    {
-      "id": 1,
-      "tingkatBahaya": "Tinggi",
-      "waktu": "09-08-2026, 14.20",
-      "deskripsi": "Suara gemuruh terdengar arah bukit, dan beberapa batu kecil berjatuhan",
-      "lokasi": "Bukit Selatan KM 15 LS -0,0000000288197",
-      "pelapor": "Apriansyah",
-      "telepon": "0821-XXXX-XXXX",
-      "status": "Baru", // Baru, Diproses, Selesai, Arsip
-      "catatan": null,
-    }
-  ];
+  List<Map<String, dynamic>> get _reports => DummyData.reports;
 
   @override
   void initState() {

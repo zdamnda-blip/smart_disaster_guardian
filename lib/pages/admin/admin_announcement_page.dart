@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../services/dummy_data.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_radius.dart';
 import '../../theme/app_shadows.dart';
 
-// NEW: Admin Announcement Page
 class AdminAnnouncementPage extends StatefulWidget {
   const AdminAnnouncementPage({super.key});
 
@@ -13,26 +13,23 @@ class AdminAnnouncementPage extends StatefulWidget {
 }
 
 class _AdminAnnouncementPageState extends State<AdminAnnouncementPage> {
-  // TODO: HAPUS DUMMY DATA INI SAAT BACKEND SIAP
-  final List<Map<String, dynamic>> _announcements = [
-    {
-      "id": 1,
-      "text": "Telah terjadi longsor pada KM 8 yang mengakibatkan pohon tumbang menutupi jalan",
-      "date": "09-08-2026 09.30",
-      "isUrgent": true,
-    },
-    {
-      "id": 2,
-      "text": "Evakuasi darurat di jalur NUPA BOMBA KM 8 - Berlaku buka tutup jalan mulai pukul 10.00",
-      "date": "09-08-2026 09.45",
-      "isUrgent": false,
-    },
-  ];
+  // Use data from DummyData
+  List<Map<String, dynamic>> get _announcements => DummyData.announcements;
 
-  void _showAddDialog() {
-    final textController = TextEditingController();
-    final dateController = TextEditingController();
-    bool isUrgent = false;
+  void _showAddDialog({Map<String, dynamic>? existingItem}) {
+    final textController = TextEditingController(text: existingItem?['text'] ?? '');
+    
+    DateTime? selectedDate = existingItem != null 
+        ? DateTime.tryParse(existingItem['date'].toString().replaceAll(" ", "T")) 
+        : null;
+        
+    final dateController = TextEditingController(
+      text: selectedDate != null 
+          ? "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}"
+          : '',
+    );
+    bool isUrgent = existingItem?['isUrgent'] ?? false;
+    String errorMsg = '';
 
     showDialog(
       context: context,
@@ -41,7 +38,7 @@ class _AdminAnnouncementPageState extends State<AdminAnnouncementPage> {
           builder: (context, setStateDialog) {
             return AlertDialog(
               shape: RoundedRectangleBorder(borderRadius: AppRadius.large),
-              title: const Text("Tambah Pengumuman", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              title: Text(existingItem == null ? "Tambah Pengumuman" : "Edit Pengumuman", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -53,7 +50,7 @@ class _AdminAnnouncementPageState extends State<AdminAnnouncementPage> {
                       controller: textController,
                       maxLines: 3,
                       decoration: InputDecoration(
-                        hintText: "Value",
+                        hintText: "Masukkan isi pengumuman",
                         border: OutlineInputBorder(borderRadius: AppRadius.medium),
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       ),
@@ -61,12 +58,86 @@ class _AdminAnnouncementPageState extends State<AdminAnnouncementPage> {
                     const SizedBox(height: 16),
                     const Text("Waktu/Tanggal", style: TextStyle(fontSize: 12)),
                     const SizedBox(height: 8),
-                    TextField(
-                      controller: dateController,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(borderRadius: AppRadius.medium),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: dateController,
+                            readOnly: true,
+                            decoration: InputDecoration(
+                              hintText: "Pilih tanggal",
+                              suffixIcon: const Icon(Icons.calendar_today, size: 20),
+                              border: OutlineInputBorder(borderRadius: AppRadius.medium),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            ),
+                            onTap: () async {
+                              final pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: selectedDate ?? DateTime.now(),
+                                firstDate: DateTime.now(), // Prevent past dates
+                                lastDate: DateTime(2030),
+                              );
+                              
+                              if (pickedDate != null) {
+                                setStateDialog(() {
+                                  selectedDate = DateTime(
+                                    pickedDate.year,
+                                    pickedDate.month,
+                                    pickedDate.day,
+                                    selectedDate?.hour ?? TimeOfDay.now().hour,
+                                    selectedDate?.minute ?? TimeOfDay.now().minute,
+                                  );
+                                  dateController.text = "${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}";
+                                  errorMsg = '';
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: TextField(
+                            controller: TextEditingController(
+                              text: selectedDate != null 
+                                ? "${selectedDate!.hour.toString().padLeft(2, '0')}:${selectedDate!.minute.toString().padLeft(2, '0')}"
+                                : '',
+                            ),
+                            readOnly: true,
+                            decoration: InputDecoration(
+                              hintText: "Pilih waktu",
+                              suffixIcon: const Icon(Icons.access_time, size: 20),
+                              border: OutlineInputBorder(borderRadius: AppRadius.medium),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            ),
+                            onTap: () async {
+                              if (selectedDate == null) {
+                                setStateDialog(() => errorMsg = "Pilih tanggal terlebih dahulu");
+                                return;
+                              }
+                              final pickedTime = await showTimePicker(
+                                context: context,
+                                initialTime: TimeOfDay(
+                                  hour: selectedDate!.hour, 
+                                  minute: selectedDate!.minute,
+                                ),
+                              );
+                              
+                              if (pickedTime != null) {
+                                setStateDialog(() {
+                                  selectedDate = DateTime(
+                                    selectedDate!.year,
+                                    selectedDate!.month,
+                                    selectedDate!.day,
+                                    pickedTime.hour,
+                                    pickedTime.minute,
+                                  );
+                                  errorMsg = '';
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 16),
                     Row(
@@ -82,6 +153,11 @@ class _AdminAnnouncementPageState extends State<AdminAnnouncementPage> {
                         const Text("Tandai sebagai urgent", style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                       ],
                     ),
+                    if (errorMsg.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text(errorMsg, style: const TextStyle(color: Colors.red, fontSize: 12)),
+                      ),
                   ],
                 ),
               ),
@@ -95,14 +171,42 @@ class _AdminAnnouncementPageState extends State<AdminAnnouncementPage> {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                     onPressed: () {
-                      if (textController.text.trim().isEmpty) return;
+                      if (textController.text.trim().isEmpty) {
+                        setStateDialog(() => errorMsg = "Isi pengumuman tidak boleh kosong");
+                        return;
+                      }
+                      if (selectedDate == null) {
+                        setStateDialog(() => errorMsg = "Tanggal harus dipilih");
+                        return;
+                      }
+                      
+                      if (selectedDate!.isBefore(DateTime.now().subtract(const Duration(minutes: 5)))) {
+                        setStateDialog(() => errorMsg = "Tanggal tidak boleh kurang dari waktu saat ini");
+                        return;
+                      }
+
                       setState(() {
-                        _announcements.add({
-                          "id": DateTime.now().millisecondsSinceEpoch,
-                          "text": textController.text,
-                          "date": dateController.text.isEmpty ? "Baru saja" : dateController.text,
-                          "isUrgent": isUrgent,
-                        });
+                        final formattedDate = "${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')} ${selectedDate!.hour.toString().padLeft(2, '0')}:${selectedDate!.minute.toString().padLeft(2, '0')}:00";
+                        if (existingItem == null) {
+                          // Add new
+                          _announcements.add({
+                            "id": DateTime.now().millisecondsSinceEpoch,
+                            "text": textController.text,
+                            "date": formattedDate,
+                            "isUrgent": isUrgent,
+                          });
+                        } else {
+                          // Update existing
+                          final index = _announcements.indexWhere((element) => element['id'] == existingItem['id']);
+                          if (index != -1) {
+                            _announcements[index] = {
+                              "id": existingItem['id'],
+                              "text": textController.text,
+                              "date": formattedDate,
+                              "isUrgent": isUrgent,
+                            };
+                          }
+                        }
                       });
                       Navigator.pop(context);
                     },
@@ -153,7 +257,7 @@ class _AdminAnnouncementPageState extends State<AdminAnnouncementPage> {
                 ),
                 icon: const Icon(Icons.add, size: 18),
                 label: const Text("Tambah pengumuman", style: TextStyle(fontSize: 12)),
-                onPressed: _showAddDialog,
+                onPressed: () => _showAddDialog(),
               ),
             ),
           ),
@@ -201,9 +305,7 @@ class _AdminAnnouncementPageState extends State<AdminAnnouncementPage> {
                       ),
                       IconButton(
                         icon: const Icon(Icons.edit_square, color: AppColors.primary, size: 20),
-                        onPressed: () {
-                          // TODO: Edit functionality
-                        },
+                        onPressed: () => _showAddDialog(existingItem: item),
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red, size: 20),
@@ -220,3 +322,4 @@ class _AdminAnnouncementPageState extends State<AdminAnnouncementPage> {
     );
   }
 }
+

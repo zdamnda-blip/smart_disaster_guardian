@@ -24,7 +24,9 @@ class _ChatbotPageState extends State<ChatbotPage> {
     
     _messageController.clear();
     
-    // Mock AI response
+    // MOCK AI RESPONSE / LOGIKA CHATBOT
+    // Di sinilah kamu bisa mengatur logika bagaimana chatbot merespon pengguna.
+    // Nanti, kamu bisa menyambungkannya dengan API Backend (seperti ChatGPT atau Dialogflow).
     Future.delayed(const Duration(seconds: 1), () {
       setState(() {
         if (text.toLowerCase().contains("darurat")) {
@@ -35,7 +37,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
         } else {
           _messages.add({
             "sender": "bot",
-            "text": "Maaf, saya masih belajar. Saya hanya bisa menjawab seputar aplikasi, kebun kopi, dan tanah longsor."
+            "text": "Terima kasih atas pesannya. Saat ini saya masih belajar, silakan tanyakan seputar aplikasi SIGAP."
           });
         }
       });
@@ -54,14 +56,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
         ),
         title: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(
-                color: AppColors.accent,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.smart_toy, color: AppColors.primary, size: 20),
-            ),
+            _buildChatbotIcon(size: 30),
             const SizedBox(width: 12),
             const Text('ChatBot', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16)),
           ],
@@ -185,14 +180,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isUser) ...[
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: const BoxDecoration(
-                color: AppColors.accent,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.smart_toy, color: AppColors.primary, size: 20),
-            ),
+            _buildChatbotIcon(size: 30),
             const SizedBox(width: 8),
           ],
           Flexible(
@@ -219,6 +207,17 @@ class _ChatbotPageState extends State<ChatbotPage> {
             const SizedBox(width: 32), // Spacer for user bubble
           ],
         ],
+      ),
+    );
+  }
+
+  Widget _buildChatbotIcon({double size = 40}) {
+    return ClipOval(
+      child: Image.asset(
+        "assets/images/logo_chatbot.jpeg",
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
       ),
     );
   }

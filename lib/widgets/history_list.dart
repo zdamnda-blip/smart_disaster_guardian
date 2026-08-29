@@ -45,7 +45,7 @@ class HistoryList extends StatelessWidget {
               padding: EdgeInsets.all(20),
               child: Center(
                 child: Text(
-                  "Belum ada riwayat peringatan",
+                  "tidak ada Riwayat terbaru",
                   style: TextStyle(
                     color: AppColors.textSecondary,
                   ),

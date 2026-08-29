@@ -5,14 +5,19 @@ import 'package:flutter/material.dart';
 import '../models/history_model.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
-import '../widgets/app_banner.dart';
+import '../widgets/edukasi_bencana_section.dart';
 import '../widgets/emergency_button.dart';
 import '../widgets/evacuation_section.dart';
 import '../widgets/history_list.dart';
 import '../widgets/status_info_section.dart';
 
 class HistoryPage extends StatefulWidget {
-  const HistoryPage({super.key});
+  final VoidCallback? onBack;
+
+  const HistoryPage({
+    super.key,
+    this.onBack,
+  });
 
   @override
   State<HistoryPage> createState() => _HistoryPageState();
@@ -23,6 +28,8 @@ class _HistoryPageState extends State<HistoryPage> {
   String? errorMessage;
 
   Timer? refreshTimer;
+
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -47,12 +54,14 @@ class _HistoryPageState extends State<HistoryPage> {
       setState(() {
         histories = data;
         errorMessage = null;
+        isLoading = false;
       });
     } catch (e) {
       if (!mounted) return;
 
       setState(() {
         errorMessage = e.toString();
+        isLoading = false;
       });
     }
   }
@@ -65,7 +74,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (histories.isEmpty && errorMessage == null) {
+    if (isLoading) {
       return const Scaffold(
         backgroundColor: AppColors.background,
         body: Center(
@@ -147,7 +156,7 @@ class _HistoryPageState extends State<HistoryPage> {
         backgroundColor: AppColors.primary,
         leading: IconButton(
           icon: const Icon(Icons.chevron_left, color: Colors.white, size: 30),
-          onPressed: () {},
+          onPressed: widget.onBack ?? () {},
         ),
         title: const Text(
           "INFORMASI",
@@ -174,6 +183,10 @@ class _HistoryPageState extends State<HistoryPage> {
                 histories: histories,
               ),
 
+              const SizedBox(height: 24),
+
+              const EdukasiBencanaSection(),
+              
               const SizedBox(height: 24),
 
               const StatusInfoSection(),
